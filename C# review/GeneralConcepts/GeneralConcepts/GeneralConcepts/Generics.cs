@@ -20,7 +20,7 @@ namespace GeneralConcepts.Generics
     //Delegates
     //Operator
 
-    public class MyGenericArray<T> //where T : Employee   //-> constrains
+    public class MyGenericArray<T> //where T :  Employee  //-> constrains
     {
         private T[] array;
 
@@ -42,11 +42,22 @@ namespace GeneralConcepts.Generics
     {
         public static void Test()
         {
+            var car1 = new Car()
+            {
+                OwnerName = "Pepito",
+                type = CarType.Ferrary
+            };
+
             var car2 = new Car() 
             {
                 OwnerAge = 34,
                 type = CarType.Ferrary
             };
+
+            if (car2.type == CarType.Mustang)
+            {
+
+            }
 
             Car car = new Car() {OwnerName = "autito",OwnerAge = 11 };
 
@@ -71,7 +82,7 @@ namespace GeneralConcepts.Generics
 
             //generic class of Dev
 
-            var devArray = new MyGenericArray<Developer>(2);
+            var devArray = new MyGenericArray<Employee>(2);
 
             devArray.setItem(0, new Developer() {
                 Name = "Pepe",
@@ -95,22 +106,35 @@ namespace GeneralConcepts.Generics
             Console.ReadKey();
 
             //generic method 
-            int a = 1;
-            int b = 2;
+            var a = new Developer() { Name = "one"};
+            var b = new Developer() { Name = "two" };
 
-            Swap<int>(ref a, ref b);
+            Swap<Developer>( ref a, ref b);
             System.Console.WriteLine($"{a} - {b}");
 
             //inference 
             Swap(ref a, ref b);
+
+            var testDev = new Developer() { Name = "new Pepe" };
+            ChangeName(testDev);
+            Console.WriteLine(testDev.ToString());
+
+            
         }
 
-        static void Swap<T>(ref T lhs, ref T rhs)
+        static void Swap<T>( ref T lhs, ref T rhs) 
         {
             T temp;
             temp = lhs;
             lhs = rhs;
             rhs = temp;
+        }
+
+
+        static void ChangeName(Employee emp)
+        {
+            emp.Name = "Changed";
+            emp.Skill();
         }
 
     }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-
 
 namespace GeneralConcepts.Linq
 {
@@ -43,28 +41,29 @@ namespace GeneralConcepts.Linq
 
             var yo = testDicionary[55];
 
+
+
             //Linq
             var devsToWork = PopulateDevelopers();
 
-            
-
+            //Func<TSource, bool>
+            var newList = devsToWork.Where(developer => {return developer.Age > 50; }); 
             //Filtering 
-            var lessThan30 = devsToWork.Where((e) => { return e.Age < 30; }); //&& e.something == 2
-            var containsA = devsToWork.Where(e => e.Name.ToLower().StartsWith("a"));
-
-            
+            var lessThan30 = devsToWork.Where((e) =>  e.Age < 30); //&& e.something == 2
+            var anas = devsToWork.Where(d => d.Name == "Ana");
 
             //First
             var firstNameD = devsToWork.FirstOrDefault(e => e.Name.StartsWith("D"))?? new Developer();
             var firstNameW = devsToWork.FirstOrDefault(e => e.Name.StartsWith("W")) ?? new Developer();
-            var firstNameD2 = devsToWork.Single(e => e.Id == 2);
+            var firstNameD2 = devsToWork.SingleOrDefault(e => e.Id == 2);
+
             //Ordering
-            var orderedlistByIdAsc = devsToWork.OrderBy((e) => { return e.Id; }).ThenByDescending(e => e.Name);
+            var orderedlistByIdAsc = devsToWork.OrderBy((e) => { return e.Age; }).ThenByDescending(e => e.Name);
 
             var orderedlistByIdAsc_2 = from element in devsToWork
-                                       orderby element.Name descending
                                        where element.Age > 22
-                                       select element.Name;
+                                       orderby element.Name descending
+                                       select new Car() { OwnerName = element.Name };
 
             //Projection Selecting 
             var carProjection = devsToWork
@@ -74,9 +73,12 @@ namespace GeneralConcepts.Linq
                     {
                         OwnerName = e.Name,
                         OwnerAge = e.Age,
-                        type = e.Age < 30 ? CarType.Ferrary : CarType.Beetle
+                        type = e.Age < 30 ? CarType.Ferrary : CarType.Escarabajo
                     };
                 });
+
+            var age = 12;
+     
 
             var listNames = new List<string>() { "Maria", "pepe", "pedro", "sebastian" };
 
@@ -95,7 +97,7 @@ namespace GeneralConcepts.Linq
                     {
                         OwnerName = e.Name,
                         OwnerAge = e.Age,
-                        type = e.Age < 30 ? CarType.Ferrary : CarType.Beetle
+                        type = e.Age < 30 ? CarType.Ferrary : CarType.Escarabajo
                     };
                 });
 
@@ -109,10 +111,11 @@ namespace GeneralConcepts.Linq
                                      {
                                          OwnerName = element.Name,
                                          OwnerAge = element.Age,
-                                         type = element.Age < 30 ? CarType.Ferrary : CarType.Beetle
+                                         type = element.Age < 30 ? CarType.Ferrary : CarType.Escarabajo
                                      };
 
-            var anonymous = new { Color = "ble", Shape = "Square" };
+
+            var anonymous = new  { Color = "ble", Shape = "Square" };
             var color = anonymous.Color;
             
             // anonymous class 
@@ -166,7 +169,6 @@ namespace GeneralConcepts.Linq
             }
 
         }
-
 
         public static List<Developer> PopulateDevelopers()
         {

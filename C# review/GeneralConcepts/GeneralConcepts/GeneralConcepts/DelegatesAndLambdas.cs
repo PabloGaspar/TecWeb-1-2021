@@ -5,14 +5,16 @@ using GeneralConcepts.Generics;
 
 namespace GeneralConcepts.DelegatesAndLambdas
 {
+    //public delegate void ActionDel(Employee emp, string name, int age);
+    
     public static class Tester
     {
         public static void Test()
         {
             var qa = new QA();
             // action for void functions
-            Action<Employee, string, int> action = populateEmployee;
-            populateEmployee(qa, "Peter", 22);
+            Action<Employee, string, int> action = OtherAsked;
+           // populateEmployee(qa, "Peter", 22);
             action(qa, "Peter", 22);
 
             // func for return methods
@@ -20,14 +22,20 @@ namespace GeneralConcepts.DelegatesAndLambdas
              var info = func(qa, "Tony", 23);
 
             ////Lambda expresion
+            ///
+            // (intput - parameter) => {  expresiones;
+           //  expresion;
+           //   return something;}
             //(input - parameters) =>  expression 
 
-            Action<Employee, string, int> lambdaAction = (employee, name, age) => {
+            Func<Employee, string, int,string> lambdaAction = (employee, name, age) => {
                 employee.Name = name;
                 employee.Age = age;
+                return "SSSSSW";
             };
 
-            Func<string, string> show = name =>  name.ToUpper();
+            Func<string, string> show = name => name.ToUpper(); 
+
             var res = show("andres");
 
             Func<Employee, string, int, string> lambdaFunc = (employee, name, age) => {
@@ -49,11 +57,29 @@ namespace GeneralConcepts.DelegatesAndLambdas
             return $"{employee.GetInfo()} and {employee.Skill()}";
         }
 
+
+        public static void OtherAsked(Employee employee, string name, int age)
+        {
+            employee.Name = name;
+            employee.Age = age;
+        }
+
+
+
         public static void populateEmployee(Employee employee, string name, int age)
         {
             employee.Name = name;
             employee.Age = age;
         }
+
+        /*
+        public void PrepareFood(string FoodName, function DoAfterPreare<Food>)
+        {
+            bla bla blala 
+            var preparedfood;
+
+            DoAfterPreare(preparedfood);
+        }*/
     }
 
     
