@@ -9,7 +9,7 @@ namespace Interfaces
         public string Owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public decimal MaxAmount { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public decimal calculateInterest(decimal amount)
+        public decimal CalculateInterest(decimal amount)
         {
             throw new NotImplementedException();
         }

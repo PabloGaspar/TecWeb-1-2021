@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GeneralConcepts.Folder2;
+using System;
 
 namespace GeneralConcepts
 {
@@ -14,6 +15,8 @@ namespace GeneralConcepts
 
             //Linq demo
             GeneralConcepts.Linq.Tester.Test();
+
+            var poco = new POCO();
 
         }
     }

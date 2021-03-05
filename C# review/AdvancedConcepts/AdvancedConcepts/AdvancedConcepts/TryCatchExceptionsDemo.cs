@@ -8,7 +8,6 @@ namespace AdvancedConcepts
     {
         public static void Test()
         {
-
             try
             {
                 SomeMethod();
@@ -16,7 +15,7 @@ namespace AdvancedConcepts
             }
             catch(MyException ex)
             {
-
+                Console.WriteLine("MyException");
             }
             catch (Exception ex)
             {
@@ -27,6 +26,9 @@ namespace AdvancedConcepts
             int x = 0;
             try
             {
+                object myObject = null;
+                myObject.ToString();
+                throw new Exception("soemthing happend");
                 int y = 100 / x;
             }
             catch (ArithmeticException e)
@@ -74,8 +76,6 @@ namespace AdvancedConcepts
             throw new InvalidOperationException();
         }
     }
-
-   
 
     public enum ErroType
     {

@@ -24,7 +24,7 @@ namespace Interfaces
             set { maxAmount = value; }
         }
 
-        public decimal calculateInterest(decimal amount)
+        public decimal CalculateInterest(decimal amount)
         {
             decimal interestFactor;
 

@@ -24,6 +24,10 @@ namespace Interfaces
 
             ShopWithCreditCard(VCredidCard, amountToShop);
 
+            var BNBCard = new BNBCreditCard();
+
+            ShopWithCreditCard(BNBCard, 10000);
+
         }
 
         private static void ShopWithCreditCard(ICreditCard creditCard, decimal amount)
@@ -31,7 +35,7 @@ namespace Interfaces
             Console.WriteLine($"Brand {creditCard.GetBrand()}" );
             var holderInformation = creditCard.GetHolderInformation();
             Console.WriteLine($"information:{holderInformation.Name} {holderInformation.Address}");
-            var interest = creditCard.calculateInterest(amount);
+            var interest = creditCard.CalculateInterest(amount);
             Console.WriteLine($"the interes will be: {interest}$ if you spend {amount}$");
         }
     }

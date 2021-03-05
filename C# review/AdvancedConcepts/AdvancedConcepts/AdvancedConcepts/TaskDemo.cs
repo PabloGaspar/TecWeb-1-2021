@@ -47,13 +47,14 @@ namespace AdvancedConcepts
 
             Console.WriteLine("After task 2 was runned");
 
-            Task.Run(() => {
+            var mytasktowait = Task.Run(() => {
 
                 Console.WriteLine("run from lambda");
             });
 
+            mytasktowait.Wait();
 
-            var taskWithResult = Task<int>.Run(() => {
+            Task<int> taskWithResult = Task<int>.Run(() => {
                 // Just loop.
                 int max = 1000000;
                 int ctr = 0;
@@ -85,16 +86,17 @@ namespace AdvancedConcepts
 
             var chef = new Chef();
 
-            var chickenTask = chef.PutChickenInTheOvenAsync();
-           // Console.WriteLine($"{chicken} : is ready");
-
+            var chickenAsyncTask = chef.PutChickenInTheOvenAsync();
+         
             Thread.Sleep(1000);
 
             var salad = chef.PrepareSalad();
             Console.WriteLine($"{salad} : is ready");
 
-            var chicken = await chickenTask;
+            var chicken = await chickenAsyncTask;
             Console.WriteLine($"{chicken} : is ready");
+
+            Console.WriteLine($"your dish with {chicken} and {salad} is ready");
         }
 
         public async static Task TestChefAsync()
@@ -119,17 +121,21 @@ namespace AdvancedConcepts
     {
         public async Task<string> PutChickenInTheOvenAsync()
         {
-           var prepareChiken = Task.Run(() => {
+            var chikenTask = Task.Run(()=> {
                 Console.WriteLine("putting the chicken in the oven");
-                Thread.Sleep(25000);
+                Thread.Sleep(30000);
                 Console.WriteLine("getting the chicken from the oven");
-
+                //return  "fried chicken"
             });
 
-            await prepareChiken;
 
-            ///
+            /*
+             * var chicken = await chikenTask;
+             * return chicken;
+             */
+            await chikenTask;
 
+            //mucho codigo  ........
             return "fried chicken";
         }
 
@@ -149,7 +155,7 @@ namespace AdvancedConcepts
             await Task.Run(() =>
             {
                 Console.WriteLine("putting the chicken in the oven");
-                Thread.Sleep(20000);
+                Thread.Sleep(30000);
                 Console.WriteLine("getting the chicken from the oven");
             });
 

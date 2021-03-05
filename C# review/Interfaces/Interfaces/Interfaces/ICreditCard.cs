@@ -11,6 +11,6 @@ namespace Interfaces
 
         string GetBrand(); 
         CardHolderInfo GetHolderInformation();
-        decimal calculateInterest(decimal amount);
+        decimal CalculateInterest(decimal amount);
     }
 }
