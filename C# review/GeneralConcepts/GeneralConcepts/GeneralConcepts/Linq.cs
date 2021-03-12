@@ -47,7 +47,7 @@ namespace GeneralConcepts.Linq
             var devsToWork = PopulateDevelopers();
 
             //Func<TSource, bool>
-            var newList = devsToWork.Where(developer => {return developer.Age > 50; }); 
+            var newList = devsToWork.Where((Developer developer) => {return developer.Age > 50; }); 
             //Filtering 
             var lessThan30 = devsToWork.Where((e) =>  e.Age < 30); //&& e.something == 2
             var anas = devsToWork.Where(d => d.Name == "Ana");

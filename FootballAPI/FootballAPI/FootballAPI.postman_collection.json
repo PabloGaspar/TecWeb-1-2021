@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "b8ededa2-47bc-4b6b-b0f3-3fc682cc4011",
+		"name": "FootballAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetTeams",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3030/api/teams?orderby=name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams"
+					],
+					"query": [
+						{
+							"key": "orderby",
+							"value": "name"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTeam",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3030/api/teams/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateTeam",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Manchester United\",\r\n    \"fundationDate\": \"1882-03-12T00:00:00\",\r\n    \"city\": \"Manchester\",\r\n    \"dtName\": \"SomeOne\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/api/teams",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteTeam",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3030/api/teams/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateTeam",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Manchester United FCCCCCC\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3030/api/teams/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPlayers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3030/api/teams/652161651/players",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams",
+						"652161651",
+						"players"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPlayer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3030/api/teams/2/players/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"api",
+						"teams",
+						"2",
+						"players",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

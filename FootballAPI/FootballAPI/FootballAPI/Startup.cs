@@ -1,3 +1,4 @@
+using FootballAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,8 @@ namespace FootballAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<ITeamsService, TeamsService>();
+            services.AddSingleton<IPlayersService, PlayerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

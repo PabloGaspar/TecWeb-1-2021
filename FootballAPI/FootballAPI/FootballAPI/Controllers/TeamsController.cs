@@ -1,58 +1,129 @@
-﻿using FootballAPI.Models;
+﻿using FootballAPI.Exceptions;
+using FootballAPI.Models;
+using FootballAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace FootballAPI.Controllers
 {
     [Route("api/[controller]")]
     public class TeamsController : Controller
     {
-        static private IList<TeamModel> _teams = new List<TeamModel>() 
-        {new TeamModel()
-            {
-                Id = 1,
-                City = "London",
-                DTName = "ARsenal DT",
-                FundationDate = new DateTime(1887, 3, 12),
-                Name = "Arsenal FC"
-            } ,
-            new TeamModel()
-            {
-                Id = 2,
-                City = "Liverpool",
-                DTName = "Jurgen Klóp ",
-                FundationDate = new DateTime(1888, 5 , 22),
-                Name = "Liverpool FC"
-            }
-        };
         
+        private ITeamsService _teamsService;
+
+        public TeamsController(ITeamsService teamsService)
+        {
+            _teamsService = teamsService;
+        }
+
         // api/teams
         [HttpGet]
-        public IEnumerable<TeamModel> GetTeams()
+        public ActionResult<IEnumerable<TeamModel>> GetTeams(string orderBy = "Id")
         {
-            return _teams;
+            try
+            {
+                var teams = _teamsService.GetTeams(orderBy);
+                return Ok(teams);
+            }
+            catch(InvalidOperationItemException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
         }
 
         // api/teams/2
         [HttpGet("{teamId:long}")]
-        public TeamModel GetTeam(long teamId)
+        public ActionResult<TeamModel> GetTeam(long teamId)
         {
-            var team = _teams.First(t => t.Id == teamId);
-            return team;
+            try
+            {
+                var team = _teamsService.GetTeam(teamId);
+                return Ok(team);
+            }
+            catch(NotFoundItemException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
         }
 
+        // api/teams
         [HttpPost]
-        public TeamModel CreateTeam([FromBody] TeamModel newTeam)
+        public ActionResult<TeamModel> CreateTeam([FromBody] TeamModel newTeam)
         {
-            var nextId = _teams.OrderByDescending(t => t.Id).FirstOrDefault().Id + 1;
-            newTeam.Id = nextId;
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                
+                var team = _teamsService.CreateTeam(newTeam);
+                return Created($"/api/teams/{team.Id}", team);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
+        }
 
-            _teams.Add(newTeam);
+        [HttpDelete("{teamId:long}")]
+        public ActionResult<bool> DeleteTeam(long teamId)
+        {
+            try
+            {
+                var result = _teamsService.DeleteTeam(teamId);
+                return Ok(result);
+            }
+            catch (NotFoundItemException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
+        }
 
-            return newTeam;
+        [HttpPut("{teamId:long}")]
+        public ActionResult<TeamModel> UpdateTeam(long teamId, [FromBody] TeamModel updatedTeam)
+        {
+            try
+            {
+                /*if (!ModelState.IsValid)
+                {
+                    foreach (var pair in ModelState)
+                    {
+                        if (pair.Key == nameof(updatedTeam.City) && pair.Value.Errors.Count > 0)
+                        {
+                            return BadRequest(pair.Value.Errors);
+                        }
+                    }
+                }*/
+                
+                var team = _teamsService.UpdateTeam(teamId, updatedTeam);
+                return Ok(team);
+            }
+            catch (NotFoundItemException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
         }
     }
 }
