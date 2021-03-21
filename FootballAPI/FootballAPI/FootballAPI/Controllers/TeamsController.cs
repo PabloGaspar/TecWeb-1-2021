@@ -44,7 +44,7 @@ namespace FootballAPI.Controllers
 
         // api/teams/2
         [HttpGet("{teamId:long}")]
-        public ActionResult<TeamModel> GetTeam(long teamId)
+        public ActionResult<TeamWithPlayerModel> GetTeam(long teamId)
         {
             try
             {

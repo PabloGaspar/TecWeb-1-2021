@@ -1,4 +1,7 @@
-﻿using FootballAPI.Exceptions;
+﻿using AutoMapper;
+using FootballAPI.Data.Entities;
+using FootballAPI.Data.Repositories;
+using FootballAPI.Exceptions;
 using FootballAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +14,9 @@ namespace FootballAPI.Services
     {
         private IList<TeamModel> _teams;
 
+        private IFootballRepository _foootballRepository;
+        private IMapper _mapper;
+
         private HashSet<string> _allowedOrderByValues = new HashSet<string>()
         {
             "id",
@@ -18,79 +24,53 @@ namespace FootballAPI.Services
             "city"
         };
 
-        public TeamsService()
+        public TeamsService(IFootballRepository foootballRepository, IMapper mapper)
         {
-            _teams = new List<TeamModel>();
-
-            _teams.Add(new TeamModel()
-            {
-                Id = 1,
-                City = "Barcelona",
-                DTName = "someone",
-                FundationDate = new DateTime(1887, 3, 12),
-                Name = "Barcelona FC"
-            });
-            _teams.Add(new TeamModel()
-            {
-                Id = 2,
-                City = "Liverpool",
-                DTName = "Jurgen Klóp ",
-                FundationDate = new DateTime(1888, 5, 22),
-                Name = "Liverpool FC"
-            });
+            _foootballRepository = foootballRepository;
+            _mapper = mapper;
         }
 
         public TeamModel CreateTeam(TeamModel newTeam)
         {
-            var nextId = _teams.OrderByDescending(t => t.Id).FirstOrDefault().Id + 1;
-            newTeam.Id = nextId;
-            _teams.Add(newTeam);
-            return newTeam;
+            var createdTeam = _foootballRepository.CreateTeam(_mapper.Map<TeamEntity>(newTeam));
+            return _mapper.Map<TeamModel>(createdTeam);
         }
 
         public bool DeleteTeam(long teamId)
         {
             var teamToDelete = GetTeam(teamId);
-            _teams.Remove(teamToDelete);
+            _foootballRepository.DeleteTeam(teamId);
             return true;
         }
 
-        public TeamModel GetTeam(long teamId)
+        public TeamWithPlayerModel GetTeam(long teamId)
         {
-            var team = _teams.FirstOrDefault(t => t.Id == teamId);
+            var team = _foootballRepository.GetTeam(teamId);
+
             if (team == null)
             {
                 throw new NotFoundItemException($"The team with id: {teamId} does not exists.");
             }
-            return team;
+
+            var teamWithPlayers = new TeamWithPlayerModel(_mapper.Map<TeamModel>(team));
+            //teamWithPlayers.Players = 
+            return teamWithPlayers;
         }
 
         public IEnumerable<TeamModel> GetTeams(string orderBy = "Id")
         {
             if (!_allowedOrderByValues.Contains(orderBy.ToLower()))
                 throw new InvalidOperationItemException($"The Orderby value: {orderBy} is invalid, please use one of {String.Join(',', _allowedOrderByValues.ToArray())}");
-
-            switch (orderBy.ToLower())
-            {
-                case "name":
-                    return _teams.OrderBy(t => t.Name);
-                case "city":
-                    return _teams.OrderBy(t => t.City);
-                default:
-                    return _teams.OrderBy(t => t.Id);
-            }
+            var entityList = _foootballRepository.GetTeams(orderBy.ToLower());
+            var modelList = _mapper.Map<IEnumerable<TeamModel>>(entityList);
+            return modelList;
         }
 
         public TeamModel UpdateTeam(long teamId, TeamModel updatedTeam)
         {
-            updatedTeam.Id = teamId;
             var team = GetTeam(teamId);
-            team.Name = updatedTeam.Name ?? team.Name;
-            team.City = updatedTeam.City ?? team.City;
-            team.DTName = updatedTeam.DTName ?? team.DTName;
-            team.FundationDate = updatedTeam.FundationDate ?? team.FundationDate;
-
-            return team;
+            var updatedTeamEntity = _foootballRepository.UpdateTeam(teamId, _mapper.Map<TeamEntity>(team));
+            return _mapper.Map<TeamModel>(updatedTeamEntity);
         }
     }
 }

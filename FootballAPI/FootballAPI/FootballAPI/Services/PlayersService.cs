@@ -1,4 +1,6 @@
-﻿using FootballAPI.Exceptions;
+﻿using AutoMapper;
+using FootballAPI.Data.Repositories;
+using FootballAPI.Exceptions;
 using FootballAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -7,60 +9,16 @@ using System.Threading.Tasks;
 
 namespace FootballAPI.Services
 {
-    public class PlayerService : IPlayersService
+    public class PlayersService : IPlayersService
     {
         private ICollection<PlayerModel> _players;
-        private ITeamsService _teamsService;
+        private IFootballRepository _footballRepository;
+        private IMapper _mapper;
 
-        public PlayerService(ITeamsService teamsService)
+        public PlayersService(IFootballRepository footballRepository, IMapper mapper)
         {
-            _teamsService = teamsService;
-
-            _players = new List<PlayerModel>();
-
-            _players.Add(new PlayerModel() 
-            {
-                Id = 1,
-                LastName = "Messi",
-                Name = "Leo",
-                Number = 10,
-                Position = "front player",
-                Salary = 5000000,
-                TeamId = 1
-            });
-
-            _players.Add(new PlayerModel()
-            {
-                Id = 2,
-                LastName = "Griezman",
-                Name = "Antoinee",
-                Number = 20,
-                Position = "right front player",
-                Salary = 3500000,
-                TeamId = 1
-            });
-
-            _players.Add(new PlayerModel()
-            {
-                Id = 3,
-                LastName = "Salah",
-                Name = "Mohamed",
-                Number = 14,
-                Position = "left front player",
-                Salary = 4500000,
-                TeamId = 2
-            });
-
-            _players.Add(new PlayerModel()
-            {
-                Id = 4,
-                LastName = "Mane",
-                Name = "Sadio",
-                Number = 10,
-                Position = "right front player",
-                Salary = 4000000,
-                TeamId = 2
-            });
+            _footballRepository = footballRepository;
+            _mapper = mapper;
         }
         
         
@@ -84,12 +42,12 @@ namespace FootballAPI.Services
         public PlayerModel GetPlayer(long teamId, long playerId)
         {
             ValidateTeam(teamId);
-            var player = _players.FirstOrDefault(p => p.TeamId == teamId && p.Id == playerId);
-            if (player == null)
+            var playerEntity = _footballRepository.GetPlayer(teamId, playerId);
+            if (playerEntity == null)
             {
                 throw new NotFoundItemException($"The player with id: {playerId} does not exist in team with id:{teamId}.");
             }
-            return player;
+            return _mapper.Map<PlayerModel>(playerEntity);
         }
 
         public IEnumerable<PlayerModel> GetPlayers(long teamId)
@@ -111,7 +69,11 @@ namespace FootballAPI.Services
 
         private void ValidateTeam(long teamId)
         {
-            _teamsService.GetTeam(teamId);
+            var team = _footballRepository.GetTeam(teamId);
+            if (team == null)
+            {
+                throw new NotFoundItemException($"The team with id: {teamId} does not exists.");
+            }
         }
     }
 }

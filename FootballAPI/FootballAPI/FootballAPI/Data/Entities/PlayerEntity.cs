@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FootballAPI.Models
+namespace FootballAPI.Data.Entities
 {
-    public class PlayerModel
+    public class PlayerEntity
     {
         public long Id { get; set; }
-        [Required]
         public string Name { get; set; }
         public string LastName { get; set; }
         public int? Number { get; set; }

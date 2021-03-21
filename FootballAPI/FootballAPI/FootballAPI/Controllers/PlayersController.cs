@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace FootballAPI.Controllers
 {
     [Route("api/teams/{teamId:long}/[controller]")]
-    public class PlayersController : Controller
+    public class PlayersController : ControllerBase
     {
 
         private IPlayersService _playerService;
@@ -57,6 +57,65 @@ namespace FootballAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
             }
 
+        }
+
+        [HttpPost]
+        public ActionResult<PlayerModel> CreatePlayer(long teamId, [FromBody] PlayerModel newPlayer)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var createdPlayer =_playerService.CreatePlayer(teamId, newPlayer);
+                return Created($"/api/teams/{teamId}/players/{createdPlayer.Id}", createdPlayer);
+            }
+            catch (NotFoundItemException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
+        }
+
+        [HttpDelete("{playerId:int}")]
+        public ActionResult<bool> DeletePlayer(long teamId, long playerId)
+        {
+            try
+            {
+                var result = _playerService.DeletePlayer(teamId, playerId);
+                return Ok(result);
+            }
+            catch (NotFoundItemException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
+        }
+
+        [HttpPut("{playerId:long}")]
+        public ActionResult<PlayerModel> UpdatePlayer(long teamId, long playerId, [FromBody] PlayerModel playerToUpdate)
+        {
+            try
+            {
+                var updatedPayer = _playerService.UpdatePlayer(teamId, playerId, playerToUpdate);
+                return Ok(updatedPayer);
+            }
+            catch (NotFoundItemException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
         }
 
     }

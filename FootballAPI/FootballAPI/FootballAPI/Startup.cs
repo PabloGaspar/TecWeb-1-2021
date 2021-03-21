@@ -27,7 +27,10 @@ namespace FootballAPI
         {
             services.AddControllers();
             services.AddSingleton<ITeamsService, TeamsService>();
-            services.AddSingleton<IPlayersService, PlayerService>();
+            services.AddSingleton<IPlayersService, PlayersService>();
+
+            //automapper configuration
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
