@@ -12,7 +12,6 @@ namespace FootballAPI.Services
 {
     public class TeamsService : ITeamsService
     {
-        private IList<TeamModel> _teams;
 
         private IFootballRepository _foootballRepository;
         private IMapper _mapper;
@@ -52,9 +51,8 @@ namespace FootballAPI.Services
                 throw new NotFoundItemException($"The team with id: {teamId} does not exists.");
             }
 
-            var teamWithPlayers = new TeamWithPlayerModel(_mapper.Map<TeamModel>(team));
-            //teamWithPlayers.Players = 
-            return teamWithPlayers;
+            
+            return _mapper.Map< TeamWithPlayerModel>(team);
         }
 
         public IEnumerable<TeamModel> GetTeams(string orderBy = "Id")
@@ -68,9 +66,15 @@ namespace FootballAPI.Services
 
         public TeamModel UpdateTeam(long teamId, TeamModel updatedTeam)
         {
-            var team = GetTeam(teamId);
-            var updatedTeamEntity = _foootballRepository.UpdateTeam(teamId, _mapper.Map<TeamEntity>(team));
+            ValidateTeam(teamId);
+            updatedTeam.Id = teamId;
+            var updatedTeamEntity = _foootballRepository.UpdateTeam(teamId, _mapper.Map<TeamEntity>(updatedTeam));
             return _mapper.Map<TeamModel>(updatedTeamEntity);
+        }
+
+        private void ValidateTeam(long teamId)
+        {
+            GetTeam(teamId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FootballAPI.Data.Entities;
 using FootballAPI.Data.Repositories;
 using FootballAPI.Exceptions;
 using FootballAPI.Models;
@@ -11,7 +12,6 @@ namespace FootballAPI.Services
 {
     public class PlayersService : IPlayersService
     {
-        private ICollection<PlayerModel> _players;
         private IFootballRepository _footballRepository;
         private IMapper _mapper;
 
@@ -25,17 +25,14 @@ namespace FootballAPI.Services
         public PlayerModel CreatePlayer(long teamId, PlayerModel newPlayer)
         {
             ValidateTeam(teamId);
-            newPlayer.TeamId = teamId;
-            var nextId = _players.OrderByDescending(p => p.Id).FirstOrDefault().Id + 1;
-            newPlayer.Id = nextId;
-            _players.Add(newPlayer);
-            return newPlayer;
+            var createdPlayer = _footballRepository.CreatePlayer(teamId, _mapper.Map<PlayerEntity>(newPlayer));
+            return _mapper.Map<PlayerModel>(createdPlayer);
         }
 
         public bool DeletePlayer(long teamId, long playerId)
         {
-            var playerToDelete = GetPlayer(teamId, playerId);
-            _players.Remove(playerToDelete);
+            ValidateTeamAndPlater(teamId, playerId);
+            _footballRepository.DeletePlayer(teamId, playerId);
             return true;
         }
 
@@ -53,18 +50,14 @@ namespace FootballAPI.Services
         public IEnumerable<PlayerModel> GetPlayers(long teamId)
         {
             ValidateTeam(teamId);
-            return _players.Where(p => p.TeamId == teamId);
+            var players = _footballRepository.GetPlayers(teamId);
+            return _mapper.Map<IEnumerable<PlayerModel>>(players);
         }
 
         public PlayerModel UpdatePlayer(long teamId, long playerId, PlayerModel updatedPlayer)
         {
-            var playerToUpdate = GetPlayer(teamId, playerId);
-            playerToUpdate.LastName = updatedPlayer.LastName ?? playerToUpdate.LastName;
-            playerToUpdate.Name = updatedPlayer.Name ?? playerToUpdate.Name;
-            playerToUpdate.Number = updatedPlayer.Number ?? playerToUpdate.Number;
-            playerToUpdate.Position = updatedPlayer.Position ?? playerToUpdate.Position;
-            playerToUpdate.Salary = updatedPlayer.Salary ?? playerToUpdate.Salary;
-            return playerToUpdate;
+            var playerEntity = _footballRepository.UpdatePlayer(teamId, playerId, _mapper.Map<PlayerEntity>(updatedPlayer));
+            return _mapper.Map<PlayerModel>(playerEntity);
         }
 
         private void ValidateTeam(long teamId)
@@ -74,6 +67,11 @@ namespace FootballAPI.Services
             {
                 throw new NotFoundItemException($"The team with id: {teamId} does not exists.");
             }
+        }
+
+        private void ValidateTeamAndPlater(long teamId, long playerId)
+        {
+            var player = GetPlayer(teamId, playerId);
         }
     }
 }

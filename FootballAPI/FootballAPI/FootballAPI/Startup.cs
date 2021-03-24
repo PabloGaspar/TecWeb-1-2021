@@ -1,3 +1,4 @@
+using FootballAPI.Data.Repositories;
 using FootballAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,8 +27,10 @@ namespace FootballAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<ITeamsService, TeamsService>();
-            services.AddSingleton<IPlayersService, PlayersService>();
+            services.AddTransient<ITeamsService, TeamsService>();
+            services.AddTransient<IPlayersService, PlayersService>();
+
+            services.AddSingleton<IFootballRepository, FootballRepository>();
 
             //automapper configuration
             services.AddAutoMapper(typeof(Startup));

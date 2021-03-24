@@ -18,6 +18,9 @@ namespace FootballAPI.Data
 
             this.CreateMap<PlayerModel, PlayerEntity>()
                 .ReverseMap();
+
+            this.CreateMap<TeamWithPlayerModel, TeamEntity>()
+                .ReverseMap();
         }
     }
 }

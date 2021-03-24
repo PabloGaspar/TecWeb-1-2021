@@ -12,5 +12,6 @@ namespace FootballAPI.Data.Entities
         public DateTime? FundationDate { get; set; }
         public string City { get; set; }
         public string DTName { get; set; }
+        public IEnumerable<PlayerEntity> Players { get; set; }
     }
 }

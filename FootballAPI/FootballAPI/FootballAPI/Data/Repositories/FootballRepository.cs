@@ -82,7 +82,11 @@ namespace FootballAPI.Data.Repositories
         
         public PlayerEntity CreatePlayer(long teamId, PlayerEntity newPlayer)
         {
-            throw new NotImplementedException();
+            newPlayer.TeamId = teamId;
+            var nextId = _players.OrderByDescending(p => p.Id).FirstOrDefault().Id + 1;
+            newPlayer.Id = nextId;
+            _players.Add(newPlayer);
+            return newPlayer;
         }
 
         public TeamEntity CreateTeam(TeamEntity newTeam)
@@ -95,13 +99,15 @@ namespace FootballAPI.Data.Repositories
 
         public void DeletePlayer(long teamId, long playerId)
         {
-            throw new NotImplementedException();
+            var playerToDelete = _players.FirstOrDefault(p => p.TeamId == teamId && p.Id == playerId);
+            _players.Remove(playerToDelete);
         }
 
         public void DeleteTeam(long teamId)
         {
             var teamToDelete = _teams.First(t => t.Id == teamId);
             _teams.Remove(teamToDelete);
+            _players.RemoveAll(p => p.TeamId == teamId);
         }
 
         public PlayerEntity GetPlayer(long teamId, long playerId)
@@ -111,12 +117,17 @@ namespace FootballAPI.Data.Repositories
 
         public IEnumerable<PlayerEntity> GetPlayers(long teamId)
         {
-            throw new NotImplementedException();
+            return _players.Where(p => p.TeamId == teamId);
         }
 
         public TeamEntity GetTeam(long teamId)
         {
-            return _teams.FirstOrDefault(t => t.Id == teamId);
+            var team = _teams.FirstOrDefault(t => t.Id == teamId);
+            if (team != null)
+            {
+                team.Players = _players.Where(p => p.TeamId == teamId);
+            }
+            return team;
         }
 
         public IEnumerable<TeamEntity> GetTeams(string orderBy = "Id")
@@ -134,19 +145,25 @@ namespace FootballAPI.Data.Repositories
 
         public PlayerEntity UpdatePlayer(long teamId, long playerId, PlayerEntity updatedPlayer)
         {
-            throw new NotImplementedException();
+
+            var playerToUpdate = _players.FirstOrDefault(p => p.TeamId == teamId && p.Id == playerId);
+            playerToUpdate.LastName = updatedPlayer.LastName ?? playerToUpdate.LastName;
+            playerToUpdate.Name = updatedPlayer.Name ?? playerToUpdate.Name;
+            playerToUpdate.Number = updatedPlayer.Number ?? playerToUpdate.Number;
+            playerToUpdate.Position = updatedPlayer.Position ?? playerToUpdate.Position;
+            playerToUpdate.Salary = updatedPlayer.Salary ?? playerToUpdate.Salary;
+
+            return updatedPlayer;
         }
 
         public TeamEntity UpdateTeam(long teamId, TeamEntity updatedTeam)
         {
-            updatedTeam = _teams.First(t => t.Id == teamId);
-            updatedTeam.Id = teamId;
-            var team = GetTeam(teamId);
+            var team = _teams.First(t => t.Id == teamId);
             team.Name = updatedTeam.Name ?? team.Name;
             team.City = updatedTeam.City ?? team.City;
             team.DTName = updatedTeam.DTName ?? team.DTName;
             team.FundationDate = updatedTeam.FundationDate ?? team.FundationDate;
-            return updatedTeam;
+            return team;
         }
     }
 }

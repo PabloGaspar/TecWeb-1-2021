@@ -9,13 +9,5 @@ namespace FootballAPI.Models
     {
         public IEnumerable<PlayerModel> Players { get; set; }
 
-        public TeamWithPlayerModel(TeamModel team)
-        {
-            this.City = team.City;
-            this.DTName = team.DTName;
-            this.FundationDate = team.FundationDate;
-            this.Id = team.Id;
-            this.Name = team.Name;
-        }
     }
 }
