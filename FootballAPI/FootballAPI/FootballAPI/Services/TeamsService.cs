@@ -29,22 +29,36 @@ namespace FootballAPI.Services
             _mapper = mapper;
         }
 
-        public TeamModel CreateTeam(TeamModel newTeam)
+        public async Task<TeamModel> CreateTeamAsync(TeamModel newTeam)
         {
-            var createdTeam = _foootballRepository.CreateTeam(_mapper.Map<TeamEntity>(newTeam));
-            return _mapper.Map<TeamModel>(createdTeam);
+            var teamEntity = _mapper.Map<TeamEntity>(newTeam);
+            _foootballRepository.CreateTeam(teamEntity);
+            var result = await _foootballRepository.SaveChangesAsync();
+
+            if (result)
+            {
+                return _mapper.Map<TeamModel>(teamEntity);
+            }
+
+            throw new Exception("Database Error");
         }
 
-        public bool DeleteTeam(long teamId)
+        public async Task<bool> DeleteTeamAsync(long teamId)
         {
-            var teamToDelete = GetTeam(teamId);
-            _foootballRepository.DeleteTeam(teamId);
+            await ValidateTeamAsync(teamId);
+            await _foootballRepository.DeleteTeamAsync(teamId);
+            var result = await _foootballRepository.SaveChangesAsync();
+
+            if (!result)
+            {
+                throw new Exception("Database Error");
+            }
             return true;
         }
 
-        public TeamWithPlayerModel GetTeam(long teamId)
+        public async Task<TeamWithPlayerModel> GetTeamAsync(long teamId)
         {
-            var team = _foootballRepository.GetTeam(teamId);
+            var team = await _foootballRepository.GetTeamAsync(teamId);
 
             if (team == null)
             {
@@ -55,26 +69,33 @@ namespace FootballAPI.Services
             return _mapper.Map< TeamWithPlayerModel>(team);
         }
 
-        public IEnumerable<TeamModel> GetTeams(string orderBy = "Id")
+        public async Task<IEnumerable<TeamModel>> GetTeamsAsync(string orderBy = "Id")
         {
             if (!_allowedOrderByValues.Contains(orderBy.ToLower()))
                 throw new InvalidOperationItemException($"The Orderby value: {orderBy} is invalid, please use one of {String.Join(',', _allowedOrderByValues.ToArray())}");
-            var entityList = _foootballRepository.GetTeams(orderBy.ToLower());
+            var entityList = await _foootballRepository.GetTeamsAsync(orderBy.ToLower());
             var modelList = _mapper.Map<IEnumerable<TeamModel>>(entityList);
             return modelList;
         }
 
-        public TeamModel UpdateTeam(long teamId, TeamModel updatedTeam)
+        public async Task<TeamModel> UpdateTeamAsync(long teamId, TeamModel updatedTeam)
         {
-            ValidateTeam(teamId);
+            await GetTeamAsync(teamId);
             updatedTeam.Id = teamId;
-            var updatedTeamEntity = _foootballRepository.UpdateTeam(teamId, _mapper.Map<TeamEntity>(updatedTeam));
-            return _mapper.Map<TeamModel>(updatedTeamEntity);
+            await _foootballRepository.UpdateTeamAsync(teamId, _mapper.Map<TeamEntity>(updatedTeam));
+            var result = await _foootballRepository.SaveChangesAsync();
+
+            if (!result)
+            {
+                throw new Exception("Database Error");
+            }
+
+            return _mapper.Map<TeamModel>(updatedTeam);
         }
 
-        private void ValidateTeam(long teamId)
+        private async Task ValidateTeamAsync(long teamId)
         {
-            GetTeam(teamId);
+             await GetTeamAsync(teamId);
         }
     }
 }

@@ -8,10 +8,10 @@ namespace FootballAPI.Services
 {
     public interface ITeamsService
     {
-        public IEnumerable<TeamModel> GetTeams(string orderBy = "Id");
-        public TeamWithPlayerModel GetTeam(long teamId);
-        public TeamModel CreateTeam(TeamModel newTeam);
-        public bool DeleteTeam(long teamId);
-        public TeamModel UpdateTeam(long teamId, TeamModel updatedTeam);
+        public Task<IEnumerable<TeamModel>> GetTeamsAsync(string orderBy = "Id");
+        public Task<TeamWithPlayerModel> GetTeamAsync(long teamId);
+        public Task<TeamModel> CreateTeamAsync(TeamModel newTeam);
+        public Task<bool> DeleteTeamAsync(long teamId);
+        public Task<TeamModel> UpdateTeamAsync(long teamId, TeamModel updatedTeam);
     }
 }

@@ -25,11 +25,11 @@ namespace FootballAPI.Controllers
 
         // api/teams
         [HttpGet]
-        public ActionResult<IEnumerable<TeamModel>> GetTeams(string orderBy = "Id")
+        public async Task<ActionResult<IEnumerable<TeamModel>>> GetTeamsAsync(string orderBy = "Id")
         {
             try
             {
-                var teams = _teamsService.GetTeams(orderBy);
+                var teams = await _teamsService.GetTeamsAsync(orderBy);
                 return Ok(teams);
             }
             catch(InvalidOperationItemException ex)
@@ -44,11 +44,11 @@ namespace FootballAPI.Controllers
 
         // api/teams/2
         [HttpGet("{teamId:long}")]
-        public ActionResult<TeamWithPlayerModel> GetTeam(long teamId)
+        public async Task<ActionResult<TeamWithPlayerModel>> GetTeamAsync(long teamId)
         {
             try
             {
-                var team = _teamsService.GetTeam(teamId);
+                var team = await _teamsService.GetTeamAsync(teamId);
                 return Ok(team);
             }
             catch(NotFoundItemException ex)
@@ -63,14 +63,14 @@ namespace FootballAPI.Controllers
 
         // api/teams
         [HttpPost]
-        public ActionResult<TeamModel> CreateTeam([FromBody] TeamModel newTeam)
+        public async Task<ActionResult<TeamModel>> CreateTeamAsync([FromBody] TeamModel newTeam)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                 
-                var team = _teamsService.CreateTeam(newTeam);
+                var team = await _teamsService.CreateTeamAsync(newTeam);
                 return Created($"/api/teams/{team.Id}", team);
             }
             catch (Exception)
@@ -80,11 +80,11 @@ namespace FootballAPI.Controllers
         }
 
         [HttpDelete("{teamId:long}")]
-        public ActionResult<bool> DeleteTeam(long teamId)
+        public async Task<ActionResult<bool>> DeleteTeamAsync(long teamId)
         {
             try
             {
-                var result = _teamsService.DeleteTeam(teamId);
+                var result = await _teamsService.DeleteTeamAsync(teamId);
                 return Ok(result);
             }
             catch (NotFoundItemException ex)
@@ -98,7 +98,7 @@ namespace FootballAPI.Controllers
         }
 
         [HttpPut("{teamId:long}")]
-        public ActionResult<TeamModel> UpdateTeam(long teamId, [FromBody] TeamModel updatedTeam)
+        public async Task<ActionResult<TeamModel>> UpdateTeamAsync(long teamId, [FromBody] TeamModel updatedTeam)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace FootballAPI.Controllers
                     }
                 }*/
                 
-                var team = _teamsService.UpdateTeam(teamId, updatedTeam);
+                var team = await _teamsService.UpdateTeamAsync(teamId, updatedTeam);
                 return Ok(team);
             }
             catch (NotFoundItemException ex)

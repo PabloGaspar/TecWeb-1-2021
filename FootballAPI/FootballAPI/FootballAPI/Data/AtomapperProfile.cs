@@ -17,7 +17,9 @@ namespace FootballAPI.Data
                 .ReverseMap();
 
             this.CreateMap<PlayerModel, PlayerEntity>()
-                .ReverseMap();
+                .ForMember(ent => ent.Team, mod => mod.MapFrom(modSrc => new TeamEntity() { Id = modSrc.TeamId }))
+                .ReverseMap()
+                .ForMember(mod => mod.TeamId, ent => ent.MapFrom(entSrc => entSrc.Team.Id));
 
             this.CreateMap<TeamWithPlayerModel, TeamEntity>()
                 .ReverseMap();

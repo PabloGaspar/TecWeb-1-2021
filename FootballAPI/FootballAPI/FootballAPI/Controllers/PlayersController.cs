@@ -23,11 +23,11 @@ namespace FootballAPI.Controllers
 
         //localhost:3030/api/teams/{teamId:long}/players
         [HttpGet]
-        public ActionResult<IEnumerable<PlayerModel>> GetPlayers(long teamId)
+        public async Task<ActionResult<IEnumerable<PlayerModel>>> GetPlayersAsync(long teamId)
         {
             try
             {
-                var players = _playerService.GetPlayers(teamId);
+                var players = await _playerService.GetPlayersAsync(teamId);
                 return Ok(players);
             }
             catch (NotFoundItemException ex)
@@ -41,18 +41,18 @@ namespace FootballAPI.Controllers
         }
 
         [HttpGet("{playerId:long}")]
-        public IActionResult GetPlayer(long teamId, long playerId)
+        public async Task<IActionResult> GetPlayerAsync(long teamId, long playerId)
         {
             try
             {
-                var player = _playerService.GetPlayer(teamId, playerId);
+                var player = await _playerService.GetPlayerAsync(teamId, playerId);
                 return Ok(player);
             }
             catch (NotFoundItemException ex)
             {
                 return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
             }
@@ -60,7 +60,7 @@ namespace FootballAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PlayerModel> CreatePlayer(long teamId, [FromBody] PlayerModel newPlayer)
+        public async Task<ActionResult<PlayerModel>> CreatePlayerAsync(long teamId, [FromBody] PlayerModel newPlayer)
         {
             try
             {
@@ -69,25 +69,25 @@ namespace FootballAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var createdPlayer =_playerService.CreatePlayer(teamId, newPlayer);
+                var createdPlayer = await _playerService.CreatePlayerAsync(teamId, newPlayer);
                 return Created($"/api/teams/{teamId}/players/{createdPlayer.Id}", createdPlayer);
             }
             catch (NotFoundItemException ex)
             {
                 return NotFound(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
             }
         }
 
         [HttpDelete("{playerId:int}")]
-        public ActionResult<bool> DeletePlayer(long teamId, long playerId)
+        public async Task<ActionResult<bool>> DeletePlayerAsync(long teamId, long playerId)
         {
             try
             {
-                var result = _playerService.DeletePlayer(teamId, playerId);
+                var result = await _playerService.DeletePlayerAsync(teamId, playerId);
                 return Ok(result);
             }
             catch (NotFoundItemException ex)
@@ -101,11 +101,11 @@ namespace FootballAPI.Controllers
         }
 
         [HttpPut("{playerId:long}")]
-        public ActionResult<PlayerModel> UpdatePlayer(long teamId, long playerId, [FromBody] PlayerModel playerToUpdate)
+        public async Task<ActionResult<PlayerModel>> UpdatePlayerAsync(long teamId, long playerId, [FromBody] PlayerModel playerToUpdate)
         {
             try
             {
-                var updatedPayer = _playerService.UpdatePlayer(teamId, playerId, playerToUpdate);
+                var updatedPayer = await _playerService.UpdatePlayerAsync(teamId, playerId, playerToUpdate);
                 return Ok(updatedPayer);
             }
             catch (NotFoundItemException ex)

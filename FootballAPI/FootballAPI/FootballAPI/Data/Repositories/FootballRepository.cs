@@ -1,4 +1,5 @@
 ﻿using FootballAPI.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,162 +9,125 @@ namespace FootballAPI.Data.Repositories
 {
     public class FootballRepository : IFootballRepository
     {
-        private  List<TeamEntity> _teams;
-        private  List<PlayerEntity> _players;
+        private FootballDbContext _dbContext;
 
-        public FootballRepository()
+        public FootballRepository(FootballDbContext dbContext)
         {
-            _teams = new List<TeamEntity>();
-
-            _teams.Add(new TeamEntity()
-            {
-                Id = 1,
-                City = "Barcelona",
-                DTName = "someone",
-                FundationDate = new DateTime(1887, 3, 12),
-                Name = "Barcelona FC"
-            });
-            _teams.Add(new TeamEntity()
-            {
-                Id = 2,
-                City = "Liverpool",
-                DTName = "Jurgen Klóp ",
-                FundationDate = new DateTime(1888, 5, 22),
-                Name = "Liverpool FC"
-            });
-           
-
-            _players = new List<PlayerEntity>();
-
-            _players.Add(new PlayerEntity()
-            {
-                Id = 1,
-                LastName = "Messi",
-                Name = "Leo",
-                Number = 10,
-                Position = "front player",
-                Salary = 5000000,
-                TeamId = 1
-            });
-
-            _players.Add(new PlayerEntity()
-            {
-                Id = 2,
-                LastName = "Griezman",
-                Name = "Antoinee",
-                Number = 20,
-                Position = "right front player",
-                Salary = 3500000,
-                TeamId = 1
-            });
-
-            _players.Add(new PlayerEntity()
-            {
-                Id = 3,
-                LastName = "Salah",
-                Name = "Mohamed",
-                Number = 14,
-                Position = "left front player",
-                Salary = 4500000,
-                TeamId = 2
-            });
-
-            _players.Add(new PlayerEntity()
-            {
-                Id = 4,
-                LastName = "Mane",
-                Name = "Sadio",
-                Number = 10,
-                Position = "right front player",
-                Salary = 4000000,
-                TeamId = 2
-            });
+            _dbContext = dbContext;
         }
+
         
-        public PlayerEntity CreatePlayer(long teamId, PlayerEntity newPlayer)
+        public void CreatePlayer(long teamId, PlayerEntity newPlayer)
         {
-            newPlayer.TeamId = teamId;
-            var nextId = _players.OrderByDescending(p => p.Id).FirstOrDefault().Id + 1;
-            newPlayer.Id = nextId;
-            _players.Add(newPlayer);
-            return newPlayer;
+            _dbContext.Entry(newPlayer.Team).State = EntityState.Unchanged;
+            _dbContext.Players.Add(newPlayer);
+            
         }
 
-        public TeamEntity CreateTeam(TeamEntity newTeam)
+        public void CreateTeam(TeamEntity newTeam)
         {
-            var nextId = _teams.OrderByDescending(t => t.Id).FirstOrDefault().Id + 1;
-            newTeam.Id = nextId;
-            _teams.Add(newTeam);
-            return newTeam;
+            _dbContext.Teams.Add(newTeam);
         }
 
-        public void DeletePlayer(long teamId, long playerId)
+        public async Task DeletePlayerAsync(long teamId, long playerId)
         {
-            var playerToDelete = _players.FirstOrDefault(p => p.TeamId == teamId && p.Id == playerId);
-            _players.Remove(playerToDelete);
+            var playerToDelete = await _dbContext.Players.FirstOrDefaultAsync(p => p.Id == playerId);
+            _dbContext.Remove(playerToDelete);
         }
 
-        public void DeleteTeam(long teamId)
+        public async Task DeleteTeamAsync(long teamId)
         {
-            var teamToDelete = _teams.First(t => t.Id == teamId);
-            _teams.Remove(teamToDelete);
-            _players.RemoveAll(p => p.TeamId == teamId);
+            var teamToDelete = await _dbContext.Teams.FirstAsync(t => t.Id == teamId);
+            _dbContext.Teams.Remove(teamToDelete);
+            
         }
 
-        public PlayerEntity GetPlayer(long teamId, long playerId)
+        public async Task<PlayerEntity> GetPlayerAsync(long teamId, long playerId)
         {
-            return _players.FirstOrDefault(p => p.TeamId == teamId && p.Id == playerId);
+            IQueryable<PlayerEntity> query = _dbContext.Players;
+            query = query.AsNoTracking();
+            //query = query.Include(p => p.Team);
+            return await query.FirstOrDefaultAsync(p => p.Team.Id == teamId && p.Id == playerId);
         }
 
-        public IEnumerable<PlayerEntity> GetPlayers(long teamId)
+        public async Task<IEnumerable<PlayerEntity>> GetPlayersAsync(long teamId)
         {
-            return _players.Where(p => p.TeamId == teamId);
+            IQueryable<PlayerEntity> query = _dbContext.Players;
+            query = query.Where(p => p.Team.Id == teamId);
+            query = query.Include(p => p.Team);
+            query = query.AsNoTracking();
+            return await query.ToListAsync();
         }
 
-        public TeamEntity GetTeam(long teamId)
+        public async Task<TeamEntity> GetTeamAsync(long teamId)
         {
-            var team = _teams.FirstOrDefault(t => t.Id == teamId);
-            if (team != null)
-            {
-                team.Players = _players.Where(p => p.TeamId == teamId);
-            }
-            return team;
+            IQueryable<TeamEntity> query = _dbContext.Teams;
+            query = query.AsNoTracking();
+            query = query.Include(t => t.Players);
+            return await query.FirstOrDefaultAsync(t => t.Id == teamId);
+
+            //hit to database
+            //tolist()
+            //toArray()
+            //foreach
+            //firstOfDefaul
+            //Single
+            //Count
         }
 
-        public IEnumerable<TeamEntity> GetTeams(string orderBy = "Id")
+        public async Task<IEnumerable<TeamEntity>> GetTeamsAsync(string orderBy = "Id")
         {
+            IQueryable<TeamEntity> query = _dbContext.Teams;
+            query = query.AsNoTracking();
+            
             switch (orderBy.ToLower())
             {
                 case "name":
-                    return _teams.OrderBy(t => t.Name);
+                    query = query.OrderBy(t => t.Name);
+                    break;
                 case "city":
-                    return _teams.OrderBy(t => t.City);
+                    query = query.OrderBy(t => t.City);
+                    break;
                 default:
-                    return _teams.OrderBy(t => t.Id);
+                    query = query.OrderBy(t => t.Id);
+                    break;
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            try
+            {
+                var res = await _dbContext.SaveChangesAsync();
+                return res > 0;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
             }
         }
 
-        public PlayerEntity UpdatePlayer(long teamId, long playerId, PlayerEntity updatedPlayer)
+        public async Task UpdatePlayerAsync(long teamId, long playerId, PlayerEntity updatedPlayer)
         {
-
-            var playerToUpdate = _players.FirstOrDefault(p => p.TeamId == teamId && p.Id == playerId);
+            var playerToUpdate = await _dbContext.Players.FirstOrDefaultAsync(p =>  p.Id == playerId);
             playerToUpdate.LastName = updatedPlayer.LastName ?? playerToUpdate.LastName;
             playerToUpdate.Name = updatedPlayer.Name ?? playerToUpdate.Name;
             playerToUpdate.Number = updatedPlayer.Number ?? playerToUpdate.Number;
             playerToUpdate.Position = updatedPlayer.Position ?? playerToUpdate.Position;
             playerToUpdate.Salary = updatedPlayer.Salary ?? playerToUpdate.Salary;
-
-            return updatedPlayer;
         }
 
-        public TeamEntity UpdateTeam(long teamId, TeamEntity updatedTeam)
+        public async Task UpdateTeamAsync(long teamId, TeamEntity updatedTeam)
         {
-            var team = _teams.First(t => t.Id == teamId);
+            var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
+
             team.Name = updatedTeam.Name ?? team.Name;
             team.City = updatedTeam.City ?? team.City;
             team.DTName = updatedTeam.DTName ?? team.DTName;
             team.FundationDate = updatedTeam.FundationDate ?? team.FundationDate;
-            return team;
         }
     }
 }

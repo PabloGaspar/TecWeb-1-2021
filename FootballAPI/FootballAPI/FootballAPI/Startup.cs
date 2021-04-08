@@ -1,8 +1,10 @@
+using FootballAPI.Data;
 using FootballAPI.Data.Repositories;
 using FootballAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,10 +32,15 @@ namespace FootballAPI
             services.AddTransient<ITeamsService, TeamsService>();
             services.AddTransient<IPlayersService, PlayersService>();
 
-            services.AddSingleton<IFootballRepository, FootballRepository>();
+            services.AddTransient<IFootballRepository, FootballRepository>();
 
             //automapper configuration
             services.AddAutoMapper(typeof(Startup));
+
+            //entity framework configuration  FootballConnection
+            services.AddDbContext<FootballDbContext>( options => {
+                options.UseSqlServer(Configuration.GetConnectionString("FootballConnection"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

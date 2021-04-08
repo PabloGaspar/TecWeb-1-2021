@@ -22,56 +22,87 @@ namespace FootballAPI.Services
         }
         
         
-        public PlayerModel CreatePlayer(long teamId, PlayerModel newPlayer)
+        public async Task<PlayerModel> CreatePlayerAsync(long teamId, PlayerModel newPlayer)
         {
-            ValidateTeam(teamId);
-            var createdPlayer = _footballRepository.CreatePlayer(teamId, _mapper.Map<PlayerEntity>(newPlayer));
-            return _mapper.Map<PlayerModel>(createdPlayer);
+            await ValidateTeamAsync(teamId);
+            newPlayer.TeamId = teamId;
+            var playerEntity = _mapper.Map<PlayerEntity>(newPlayer);
+
+            _footballRepository.CreatePlayer(teamId, playerEntity);
+
+            var result = await _footballRepository.SaveChangesAsync();
+
+            if (!result)
+            {
+                throw new Exception("Database Error");
+            }
+
+            return _mapper.Map<PlayerModel>(playerEntity);
         }
 
-        public bool DeletePlayer(long teamId, long playerId)
+        public async Task<bool> DeletePlayerAsync(long teamId, long playerId)
         {
-            ValidateTeamAndPlater(teamId, playerId);
-            _footballRepository.DeletePlayer(teamId, playerId);
+            await ValidateTeamAndPlaterAsync(teamId, playerId);
+            await _footballRepository.DeletePlayerAsync(teamId, playerId);
+
+            var result = await _footballRepository.SaveChangesAsync();
+
+            if (!result)
+            {
+                throw new Exception("Database Error");
+            }
+
             return true;
         }
 
-        public PlayerModel GetPlayer(long teamId, long playerId)
+        public async Task<PlayerModel> GetPlayerAsync(long teamId, long playerId)
         {
-            ValidateTeam(teamId);
-            var playerEntity = _footballRepository.GetPlayer(teamId, playerId);
+            await ValidateTeamAsync(teamId);
+            var playerEntity = await _footballRepository.GetPlayerAsync(teamId, playerId);
             if (playerEntity == null)
             {
                 throw new NotFoundItemException($"The player with id: {playerId} does not exist in team with id:{teamId}.");
             }
-            return _mapper.Map<PlayerModel>(playerEntity);
+            
+            var playerModel = _mapper.Map<PlayerModel>(playerEntity);
+
+            playerModel.TeamId = teamId;
+            return playerModel;
         }
 
-        public IEnumerable<PlayerModel> GetPlayers(long teamId)
+        public async Task<IEnumerable<PlayerModel>> GetPlayersAsync(long teamId)
         {
-            ValidateTeam(teamId);
-            var players = _footballRepository.GetPlayers(teamId);
+            await ValidateTeamAsync(teamId);
+            var players = await _footballRepository.GetPlayersAsync(teamId);
             return _mapper.Map<IEnumerable<PlayerModel>>(players);
         }
 
-        public PlayerModel UpdatePlayer(long teamId, long playerId, PlayerModel updatedPlayer)
+        public async Task<PlayerModel> UpdatePlayerAsync(long teamId, long playerId, PlayerModel updatedPlayer)
         {
-            var playerEntity = _footballRepository.UpdatePlayer(teamId, playerId, _mapper.Map<PlayerEntity>(updatedPlayer));
-            return _mapper.Map<PlayerModel>(playerEntity);
+            await ValidateTeamAndPlaterAsync(teamId, playerId);
+            await _footballRepository.UpdatePlayerAsync(teamId, playerId, _mapper.Map<PlayerEntity>(updatedPlayer));
+            var result = await _footballRepository.SaveChangesAsync();
+
+            if (!result)
+            {
+                throw new Exception("Database Error");
+            }
+
+            return updatedPlayer;
         }
 
-        private void ValidateTeam(long teamId)
+        private async Task ValidateTeamAsync(long teamId)
         {
-            var team = _footballRepository.GetTeam(teamId);
+            var team = await _footballRepository.GetTeamAsync(teamId);
             if (team == null)
             {
                 throw new NotFoundItemException($"The team with id: {teamId} does not exists.");
             }
         }
 
-        private void ValidateTeamAndPlater(long teamId, long playerId)
+        private async Task ValidateTeamAndPlaterAsync(long teamId, long playerId)
         {
-            var player = GetPlayer(teamId, playerId);
+            var player = await GetPlayerAsync(teamId, playerId);
         }
     }
 }
