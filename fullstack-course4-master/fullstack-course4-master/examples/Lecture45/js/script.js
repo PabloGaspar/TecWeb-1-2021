@@ -31,6 +31,12 @@ console.log("Stock price is: " +
   company[stockPropName]);
 
 // Better way: object literal
+
+var otherCompany = {};
+otherCompany.name = "twetter";
+otherCompany.ceo = {};
+otherCompany.ceo.name = "someone";
+
 var facebook = {
   name: "Facebook",
   ceo: {
@@ -42,12 +48,11 @@ var facebook = {
 
 console.log(facebook.ceo.firstName);
 
+const object = { a: 1, b: 2, c: 3 };
 
-
-
-
-
-
+for (const property in object) {
+  console.log(`${property}: ${object[property]}`);
+}
 
 
 

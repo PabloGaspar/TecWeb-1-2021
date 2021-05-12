@@ -49,6 +49,7 @@ class Car {
   }
 }
 
+debugger; 
 let myCar = new Car("Ford", "4x4", new Date(1995,11,17));
 console.log(myCar.calculateAge());
 myCar.showPrettyModel("MODEL:");
@@ -65,7 +66,7 @@ class Truck extends Car{
   }
 
   showPrettyModel(prefix){
-
+    super.showPrettyModel();
     console.log(`and I have ${this.model} wheels`);
   }
 

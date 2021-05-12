@@ -1,10 +1,20 @@
+
+  function myFunction(thisParam, event) {
+    document.getElementById("myDIV").className = "mystyle";
+    debugger;
+    console.log(thisParam);
+    
+  }
+
+
 // Event handling
 document.addEventListener("DOMContentLoaded", function (event) {
 
+
   function sayHello(event) {
-    
-    debugger;
+    debugger
     console.log(event);
+    console.log(this);
 
     this.textContent = "Said it!";
     var name =
@@ -27,12 +37,17 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
 
+
+
   // Unobtrusive event binding
-  document.querySelector("button")
+  /*document.querySelector("#classButton")
+    .addEventListener("click", myFunction);*/
+
+    document.querySelector("#sayIt")
     .addEventListener("click", sayHello);
 
   document.querySelector("body").addEventListener("mousemove", function (event) {
-        if (event.shiftKey === true) {
+    if (event.shiftKey === true) {
           console.log("x: " + event.clientX);
           console.log("y: " + event.clientY);
         }

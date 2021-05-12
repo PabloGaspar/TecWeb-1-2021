@@ -1,8 +1,13 @@
-var arr = ["Age"];
+var arr = [];
 
 arr.push("name");
 arr.push("lastname");
 
+arr.version = 12;
+
+for (const iterator of arr) {
+  console.log(iterator);
+}
 
 // Functions are First-Class Data Types
 // Functions ARE objects
@@ -16,6 +21,7 @@ console.log(multiply.version);
 
 // Function factory
 function makeMultiplier(multiplier) {
+  
   var myFunc = function (x) {
     return multiplier * x;
   };
@@ -38,7 +44,7 @@ console.log(doubleAll(100));
 
 
 
-// Passing functions as arguments
+// Passing functions as arguments callback
 function doOperationOn(x, operation) {
   return operation(x);
 }

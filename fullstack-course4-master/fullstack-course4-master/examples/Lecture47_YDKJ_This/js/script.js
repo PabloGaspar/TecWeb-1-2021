@@ -35,7 +35,7 @@ baz(); // <-- call-site for `baz`
 //Nothing But Rules
 //Call-site
 //Default Binding--------------------------------------------------------------------------------------------------
-//this -> global scope
+//this -> global scope -- window
 function foo() {
 	console.log( this.a );
 }
@@ -49,7 +49,7 @@ foo();
 
 var obj = {
     a: 22,
-    foo2 = function(){
+    foo2 : function(){
         console.log( this.a );  
     }
 };

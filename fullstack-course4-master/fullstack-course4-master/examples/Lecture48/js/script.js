@@ -1,7 +1,9 @@
 // Function constructors
 function Circle (radius) {
   this.radius = radius;
+
 }
+
 
 Circle.prototype.getArea = 
   function () {

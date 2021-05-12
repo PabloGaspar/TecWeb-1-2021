@@ -1,5 +1,5 @@
 // ***** String concatination
-var string = "Hello";
+var string = 'Hello';
 // string += " World";
 string = string + " World";
 console.log(string + "!");
@@ -8,7 +8,7 @@ console.log(string + "!");
 var name = "pepito";
 var age = 22;
 
-var greet =  `Hi my name is ${name} and I am ${age} and 2+2=${2 + 2}`
+var greet =  `Hi my name is ${name} and I am ${age} and 2+2=${2 + 2}`;
 
 console.log(greet);
 
@@ -36,9 +36,6 @@ x = "4";
 if (x == y) {
   console.log("x='4' is equal to y=4");
 }
-
-
-
 
 
 // ***** Strict equality
@@ -105,7 +102,7 @@ function sayHi (){
 function a() 
 {
   return
-  { 
+    { 
     name: "Yaakov"
   };
 }
