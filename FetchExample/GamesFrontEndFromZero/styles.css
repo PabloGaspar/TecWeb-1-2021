@@ -1,0 +1,13 @@
+#people-container
+{
+    background-color: rgb(73, 167, 167);
+    border: chartreuse;
+}
+
+#people-container li
+{
+    background-color: rgb(211, 107, 23);
+    border: rgb(116, 4, 221);
+    box-shadow: 10px 10px;
+    color: azure;
+}

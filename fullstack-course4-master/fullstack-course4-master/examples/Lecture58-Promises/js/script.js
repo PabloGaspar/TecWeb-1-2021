@@ -1,9 +1,9 @@
 
 function prepareOrder(){
-  return "none";
+  return "other";
 }
-
-let promiseOrder = new Promise((resolve, reject)=>{
+debugger;
+var promiseOrder = new Promise((resolve, reject)=>{
   var order = prepareOrder();
   setTimeout(function(){
     if(order === "chicken"){
@@ -15,12 +15,20 @@ let promiseOrder = new Promise((resolve, reject)=>{
 });
 
 
+/*
 promiseOrder.then((orderMessage) =>{
   console.log(`Promise succesfully resolved ${orderMessage}`)
 }).catch((errorMessage)=>{
   console.log(`Promise failed ${errorMessage}`)
 });
+*/
 
 
-console.log("this is after the promise");
+promiseOrder.then((orderMessage) =>{
+  console.log(`Promise succesfully resolved ${orderMessage}`)
+},(errorMessage)=>{
+  console.log(`Promise failed ${errorMessage}`)
+});
+
+
 

@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 
   function sayHello(event) {
-    debugger
+    debugger;
     console.log(event);
     console.log(this);
 
