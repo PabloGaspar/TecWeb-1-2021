@@ -1,3 +1,8 @@
+
+
+
+
+
 window.addEventListener('DOMContentLoaded', function(event){
 
     let teams = [];
@@ -26,6 +31,19 @@ window.addEventListener('DOMContentLoaded', function(event){
         });
     }*/
 
+    function DeleteTeam(event){
+        debugger;
+        let teamId = this.dataset.deleteTeamId;
+        let url = `${baseUrl}/teams/${teamId}`;
+        fetch(url, { 
+        method: 'DELETE' 
+        }).then((data)=>{
+            if(data.status === 200){
+                alert('deleted');
+            }
+        }); 
+    }
+
     async function fetchTeams()
     {
         const url = `${baseUrl}/teams`;
@@ -33,9 +51,19 @@ window.addEventListener('DOMContentLoaded', function(event){
         try{
             if(response.status == 200){
                 let data = await response.json();
-                let teamsLi = data.map( team => { return `<li> Name: ${team.name} | City: ${team.city} | DT: ${team.dtname} </li>`});
-                var teamContent = `<ul>${teamsLi.join('')}</ul>`;
+                let teamsLi = data.map( team => { return `<div> 
+                    Name: ${team.name} | City: ${team.city} | DT: ${team.dtname} 
+                    <button type="button" data-delete-team-id="${team.id}">DELETE</button>
+                    <button data-edit-team-id="${team.id}">EDIT</button>
+                </div>`});
+                var teamContent = teamsLi.join('');
                 document.getElementById('teams-container').innerHTML = teamContent;
+
+                let buttons = document.querySelectorAll('#teams-container div button[data-delete-team-id]');
+                for (const button of buttons) {
+                    button.addEventListener('click', DeleteTeam);
+                }
+                
             } else {
                 var errorText = await response.text();
                 alert(errorText);
@@ -45,7 +73,7 @@ window.addEventListener('DOMContentLoaded', function(event){
             alert(errorText);
         }
     }
-
+   
     function PostTeam(event)
     {
         debugger;
