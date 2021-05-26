@@ -13,7 +13,7 @@ window.addEventListener('load', (event) => {
 
     async function fetchDataAsync() {
         try {
-            
+            debugger;
             const response = await fetch('http://localhost:9236/api/companies', {
                 headers: { 
                     "Content-Type": "application/json; charset=utf-8",
