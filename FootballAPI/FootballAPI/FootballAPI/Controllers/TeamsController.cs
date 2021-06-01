@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 
@@ -17,10 +19,12 @@ namespace FootballAPI.Controllers
     {
         
         private ITeamsService _teamsService;
+        private IFileService _fileService;
 
-        public TeamsController(ITeamsService teamsService)
+        public TeamsController(ITeamsService teamsService, IFileService fileService)
         {
             _teamsService = teamsService;
+            _fileService = fileService;
         }
 
         // api/teams
@@ -62,6 +66,28 @@ namespace FootballAPI.Controllers
         }
 
         // api/teams
+        [HttpPost("Form")]
+        public async Task<ActionResult<TeamModel>> CreateTeamFormAsync([FromForm] TeamFormModel newTeam)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var file = newTeam.Image;
+                string imagePath = _fileService.UploadFile(file);
+
+                newTeam.ImagePath = imagePath;
+
+                var team = await _teamsService.CreateTeamAsync(newTeam);
+                return Created($"/api/teams/{team.Id}", team);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something unexpected happened.");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<TeamModel>> CreateTeamAsync([FromBody] TeamModel newTeam)
         {
@@ -69,7 +95,7 @@ namespace FootballAPI.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-                
+
                 var team = await _teamsService.CreateTeamAsync(newTeam);
                 return Created($"/api/teams/{team.Id}", team);
             }

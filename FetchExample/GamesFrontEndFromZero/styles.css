@@ -8,7 +8,7 @@
     justify-content: space-evenly;
 }
 
-#teams-container div
+#teams-container > div
 {
     background-color: rgb(211, 107, 23);
     border: rgb(116, 4, 221) solid;
@@ -17,4 +17,11 @@
     width: 200px;
     height: 250px;
     box-sizing: border-box;
+}
+
+.roundImage
+{
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
 }

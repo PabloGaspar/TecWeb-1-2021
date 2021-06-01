@@ -6,7 +6,9 @@
 window.addEventListener('DOMContentLoaded', function(event){
 
     let teams = [];
-    const baseUrl = 'http://localhost:3030/api';
+    const baseRawUrl = 'http://localhost:3030';
+    const baseUrl = `${baseRawUrl}/api`;
+    
 
     /*function fetchTeams()
     {
@@ -32,16 +34,21 @@ window.addEventListener('DOMContentLoaded', function(event){
     }*/
 
     function DeleteTeam(event){
-        debugger;
-        let teamId = this.dataset.deleteTeamId;
-        let url = `${baseUrl}/teams/${teamId}`;
-        fetch(url, { 
-        method: 'DELETE' 
-        }).then((data)=>{
-            if(data.status === 200){
-                alert('deleted');
-            }
-        }); 
+        
+        var r = confirm("Are you sure you want to delete it?");
+        if (r == true) {
+            let teamId = this.dataset.deleteTeamId;
+            let url = `${baseUrl}/teams/${teamId}`;
+            fetch(url, { 
+            method: 'DELETE' 
+            }).then((data)=>{
+                if(data.status === 200){
+                    alert('deleted');
+                }
+            }); 
+            location.reload();
+        } 
+        
     }
 
     async function fetchTeams()
@@ -51,8 +58,17 @@ window.addEventListener('DOMContentLoaded', function(event){
         try{
             if(response.status == 200){
                 let data = await response.json();
-                let teamsLi = data.map( team => { return `<div> 
-                    Name: ${team.name} | City: ${team.city} | DT: ${team.dtname} 
+                let teamsLi = data.map( team => { 
+                
+                const imageUrl = team.imagePath? `${baseRawUrl}/${team.imagePath}` : "";
+                return `
+                <div> 
+                    <div>
+                        <img src="${imageUrl}" alt="Avatar" class="roundImage">
+                    </div>
+                    <div>
+                        Name: ${team.name} | City: ${team.city} | DT: ${team.dtName} 
+                    </div>
                     <button type="button" data-delete-team-id="${team.id}">DELETE</button>
                     <button data-edit-team-id="${team.id}">EDIT</button>
                 </div>`});
@@ -100,6 +116,7 @@ window.addEventListener('DOMContentLoaded', function(event){
         }).then(response => {
             if(response.status === 201){
                 alert('team was created');
+                fetchTeams();
             } else {
                 response.text()
                 .then((error)=>{
@@ -107,12 +124,52 @@ window.addEventListener('DOMContentLoaded', function(event){
                 });
             }
         });
-        
+    }
 
+
+    function PostFormTeam(event)
+    {
+        debugger;
+        event.preventDefault();
+        let url = `${baseUrl}/teams/form`;
+        
+        if(!event.currentTarget.dtName.value)
+        {
+            event.currentTarget.dtName.style.backgroundColor = 'red';
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('Name', event.currentTarget.name.value);
+        formData.append('FundationDate', event.currentTarget.fundationDate.value);
+        formData.append('City',event.currentTarget.city.value);
+        formData.append('DTName', event.currentTarget.dtName.value);
+        formData.append('Image', event.currentTarget.image.files[0]);
+        debugger;
+       
+
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if(response.status === 201){
+                alert('team was created');
+                fetchTeams();
+            } else {
+                response.text()
+                .then((error)=>{
+                    alert(error);
+                });
+            }
+        });
+        fetchTeams();
     }
     
+
+    fetchTeams();
     document.getElementById('fetch-btn').addEventListener('click', fetchTeams);
     document.getElementById('create-team-frm').addEventListener('submit', PostTeam)
+    document.getElementById('create-team-form-frm').addEventListener('submit', PostFormTeam)
 });
 
 //https://www.freecodecamp.org/news/a-practical-es6-guide-on-how-to-perform-http-requests-using-the-fetch-api-594c3d91a547/

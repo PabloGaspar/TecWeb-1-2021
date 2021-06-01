@@ -1,23 +1,17 @@
-using FootballAPI.Data;
-using FootballAPI.Data.Repositories;
-using FootballAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Restaurant.Services;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FootballAPI
+namespace Restaurant
 {
     public class Startup
     {
@@ -32,26 +26,11 @@ namespace FootballAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddTransient<ITeamsService, TeamsService>();
-            services.AddTransient<IPlayersService, PlayersService>();
-            services.AddTransient<IFileService, FileService>();
-
-            services.AddTransient<IFootballRepository, FootballRepository>();
-
-            //automapper configuration
-            services.AddAutoMapper(typeof(Startup));
-
-            //entity framework configuration  FootballConnection
-            services.AddDbContext<FootballDbContext>( options => {
-                options.UseSqlServer(Configuration.GetConnectionString("FootballConnection"));
-            });
-
+            services.AddSingleton<IDishesService, DishesService>();
             services.AddCors(c =>
             {
                 c.AddPolicy("AllowOrigin", options => { options.AllowAnyOrigin(); options.AllowAnyMethod(); options.AllowAnyHeader(); });
             });
-
-           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,19 +44,9 @@ namespace FootballAPI
 
             app.UseRouting();
 
-            //app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
-
-            //serve static files 
-            app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
-                RequestPath = new PathString("/Resources")
             });
         }
     }

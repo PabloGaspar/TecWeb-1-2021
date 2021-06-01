@@ -18,5 +18,6 @@ namespace FootballAPI.Models
         [StringLength(30, ErrorMessage = "Error {0} City name is invalid it should be at most {1} and at least {2}.", MinimumLength = 2)]
         public string City { get; set; }
         public string DTName { get; set; }
+        public string ImagePath { get; set; }
     }
 }
